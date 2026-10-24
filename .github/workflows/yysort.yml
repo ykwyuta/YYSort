@@ -1,0 +1,50 @@
+name: yysort
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  workflow_dispatch:
+jobs:
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ". -> target"
+          key: yysort-${{ matrix.os }}
+      - name: Format
+        run: cargo fmt --all -- --check
+      - name: Lint
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+      - name: Real CLI, external spill and OS resource limits
+        run: cargo test --workspace --locked -- --test-threads=1
+      - name: Release
+        run: cargo build --release --locked
+      - name: Larger than worker memory, stable result and measured resource usage
+        run: python demo/benchmark.py --exe target/release/yysort --mib 256 --memory 128MiB --threads 2 --directory benchmark-yysort
+      - name: Bounded OUTFIL split, OVERLAY, field comparison and full stream verification
+        run: python demo/benchmark.py --exe target/release/yysort --mib 256 --memory 128MiB --threads 2 --directory benchmark-yysort-outfil --outfil --reformat
+      - name: Package
+        run: python tools/package.py --test
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yysort-${{ matrix.os }}
+          path: dist/yysort/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: yysort-performance-${{ matrix.os }}
+          path: |
+            benchmark-yysort/result.json
+            benchmark-yysort-outfil/result.json

@@ -1,0 +1,19 @@
+[package]
+name = "yy-encoding"
+description = "Character encodings for yyeditor: lossless transcoding, JIS family, detection"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "GPL-3.0-or-later"
+publish = false
+
+[dependencies]
+encoding_rs = "0.8.42"
+chardetng = "1.0.0"
+unicode-normalization = "0.1"
+
+[dev-dependencies]
+proptest = "1"
+
+[lints]
+workspace = true
