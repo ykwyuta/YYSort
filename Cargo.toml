@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = [".", "crates/yy-encoding"]
+members = ["."]
 
 [workspace.lints.rust]
 unsafe_code = "deny"
@@ -15,7 +15,7 @@ repository = "https://github.com/ykwyuta/YYSort"
 description = "Bounded external record sorting for fixed files and RFC 4180 CSV"
 
 [dependencies]
-yy-encoding = { path = "crates/yy-encoding" }
+yy-encoding = { git = "https://github.com/ykwyuta/YYLibrary", rev = "57deca92c834227f705496fd7c5c4a226ec8dc97" }
 clap = { version = "4", features = ["derive"] }
 tempfile = "3"
 rayon = "1.10"

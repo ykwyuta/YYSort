@@ -1,7 +1,7 @@
 # yysort
 
 Copyright (C) yyeditor contributors. GPL-3.0-or-later; repository COPYING and
-COPYING.EXCEPTION apply. yysort reuses yyeditor's yy-encoding codecs, including
+COPYING.EXCEPTION apply. yysort uses YYLibrary (https://github.com/ykwyuta/YYLibrary) yy-encoding codecs, including
 the same Japanese/EBCDIC tables and custom mapping mechanism.
 
 DFSORT is an IBM product. yysort is an independent implementation of a documented

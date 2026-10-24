@@ -1,5 +1,6 @@
 """Package the CLI, offline manual, demos, sources, and license notices."""
 import argparse
+import json
 from pathlib import Path
 import shutil
 import subprocess
@@ -20,7 +21,7 @@ def main():
     shutil.copy2(args.exe, output)
     files = ['Cargo.toml', 'Cargo.lock', 'README.md', 'VALIDATION.md', 'NOTICE.md',
              'COPYING', 'COPYING.EXCEPTION', '.gitignore', '.gitattributes']
-    directories = ['src', 'tests', 'crates', 'tools', 'demo', 'docs', 'help', '.github']
+    directories = ['src', 'tests', 'tools', 'demo', 'docs', 'help', '.github']
     source = output / 'source'
     source.mkdir(exist_ok=True)
     for name in files:
@@ -30,6 +31,19 @@ def main():
     for name in directories:
         shutil.copytree(ROOT / name, source / name, dirs_exist_ok=True,
                         ignore=shutil.ignore_patterns('target', '__pycache__', '*.pyc'))
+    metadata = json.loads(subprocess.check_output(
+        ['cargo', 'metadata', '--format-version', '1', '--locked', '--offline'], cwd=ROOT))
+    encoding = next(package for package in metadata['packages'] if package['name'] == 'yy-encoding')
+    if not (encoding['source'] or '').startswith('git+https://github.com/ykwyuta/YYLibrary'):
+        raise RuntimeError('yy-encoding must come from the pinned YYLibrary Git dependency')
+    library = Path(encoding['manifest_path']).parents[2]
+    vendor = source / 'vendor/YYLibrary'
+    vendor.mkdir(parents=True, exist_ok=True)
+    for name in ['Cargo.toml', 'Cargo.lock', 'README.md', 'COPYING', 'COPYING.EXCEPTION']:
+        shutil.copy2(library / name, vendor / name)
+    for name in ['crates', 'tools']:
+        shutil.copytree(library / name, vendor / name, dirs_exist_ok=True,
+                        ignore=shutil.ignore_patterns('target', '.git', '__pycache__', '*.pyc'))
     for name in ['help', 'demo', 'docs']:
         shutil.copytree(ROOT / name, output / name, dirs_exist_ok=True,
                         ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
