@@ -1,6 +1,8 @@
 """Package the CLI, offline manual, demos, sources, and license notices."""
 import argparse
 import json
+import re
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -19,7 +21,7 @@ def main():
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     shutil.copy2(args.exe, output)
-    files = ['Cargo.toml', 'Cargo.lock', 'README.md', 'VALIDATION.md', 'NOTICE.md',
+    files = ['Cargo.toml', 'Cargo.lock', 'README.md', 'NOTICE.md',
              'COPYING', 'COPYING.EXCEPTION', '.gitignore', '.gitattributes']
     directories = ['src', 'tests', 'tools', 'demo', 'docs', 'help', '.github']
     source = output / 'source'
@@ -47,6 +49,24 @@ def main():
     for name in ['help', 'demo', 'docs']:
         shutil.copytree(ROOT / name, output / name, dirs_exist_ok=True,
                         ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
+    # Runtime documentation and the complete source tree have different roots.
+    # Point developer source links at source/ while retaining user/manual links.
+    for document in [output / 'README.md', *(output / 'docs').rglob('*.md')]:
+        def source_link(match):
+            address = match[2]
+            if re.match(r'[a-zA-Z][a-zA-Z0-9+.-]*:|^/|^#', address):
+                return match[0]
+            path, separator, fragment = address.partition('#')
+            target = (document.parent / path).resolve()
+            if target.exists() or not target.is_relative_to(output):
+                return match[0]
+            bundled = source / target.relative_to(output)
+            if not bundled.exists():
+                return match[0]
+            relative = Path(os.path.relpath(bundled, document.parent)).as_posix()
+            return match[1] + relative + (separator + fragment if separator else '') + match[3]
+        text = document.read_text(encoding='utf-8')
+        document.write_text(re.sub(r'(\[[^\]\n]*\]\()([^\)\n]+)(\))', source_link, text), encoding='utf-8')
     subprocess.run([sys.executable, str(ROOT / 'tools/licenses.py'), str(output / 'licenses')], check=True, cwd=ROOT)
     if args.test:
         with tempfile.TemporaryDirectory(prefix='yysort-package-', dir=output.parent) as temporary:

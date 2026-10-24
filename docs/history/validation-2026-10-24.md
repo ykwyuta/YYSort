@@ -30,4 +30,4 @@ Linuxは1.48秒、ピークRSS22,405,120バイト。
 `python tools/package.py --test`でCLI・オフラインヘルプ・作例・ソース一式・依存ライセンスを作成する。
 配布された実行ファイルでCSV/固定長の作例と`--manual`を実行する。
 GitHubでの検証結果は[Actions](https://github.com/ykwyuta/YYSort/actions)を参照。
-以前の測定記録は[検証履歴](docs/validation-history.md)に保存している。
+以前の測定記録は[検証履歴](validation-earlier.md)に保存している。

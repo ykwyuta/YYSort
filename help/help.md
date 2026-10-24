@@ -161,7 +161,7 @@ SEQNUM、数値変換・編集、IFTHEN、可変長入力は引き続き未対�
 
 主な未対応: **OUTFILの帳票・HEADER/TRAILER等、JOINKEYS/JOIN/REFORMAT、IFTHEN/PARSE/FINDREP/SEQNUM、
 ALTSEQ・UCA、SYMNAMES、ICETOOL、可変長VB/RDW、全数値編集・日付・浮動小数点、JCL/DD、ユーザー出口**。
-対応拡大は提案書 `docs/design.md` に記載します。
+対応拡大は提案書 `docs/history/proposals/initial-design.md` に記載します。
 
 ## OUTFIL：複数出力・抽出・分割
 
@@ -212,7 +212,6 @@ CSVの `--header` は各出力へヘッダーを1回ずつ書き、範囲・採�
 
 0は成功、2は設定・データ等のエラー、130は捕捉した取消です。OSが上限でワーカーを終了した場合は
 ワーカーの非ゼロ終了を返すため、必ずしも2ではありません。stdoutにデータは出しません。
-`demo/benchmark.py` はメモリより大きいファイルを生成し、全件の元データ・順序・安定性・重複欠落なしを逐次検証します。
 速度はディスク・形式・キー数・設定で変わります。実測をDFSORTと同条件の速度保証とは扱いません。
 
 ## 公式仕様

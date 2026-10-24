@@ -76,7 +76,7 @@ LinuxのワーカーはCPU上限やOOM時のコアダンプによる無制限な
 CLIヘルプとデモの固定長・CSV実行も確認しました。
 
 DFSORT完全互換、OUTFIL帳票/JOINKEYS/ICETOOL、VB/RDW、すべての数値形式、ホストJCLや出口プログラムは未実装です。
-対応目標と現状の区別は `docs/design.md` と同梱ヘルプに記載しています。
+対応目標と現状の区別は `docs/history/proposals/initial-design.md` と同梱ヘルプに記載しています。
 
 
 ## OUTFIL拡張の検証（2026-10-24）
